@@ -1,0 +1,31 @@
+1. Querying the RollNo,Name of students who got placed in specific company
+   select I.RollNo,S.Name 
+   from Interview as I,Student_Details as S 
+   where Org_ID = 107 and Outcome = 'Placed' 
+   and I.RollNo=S.RollNo;
+
+2. Querying the max pay in a city
+   select Place,max(Pay) 
+   from Company 
+   inner join Profile
+   on Company.Org_ID=Profile.Org_ID 
+   group by Place;
+
+3. Queying RollNo,Name of Students who got placed
+   select S.RollNo,S.Name  
+   from Student_Details as S 
+   where S.RollNo IN( select RollNo 
+                      from Interview 
+                      where Outcome='Placed');
+
+4. Querying No.of Students Placed in each department
+   select count(distinct I.RollNo),D.Deptarment 
+   from Interview as I,Student_Details as S,Degree as D  
+   where Outcome='Placed' and I.RollNo=S.RollNo and S.Degree_ID=D.Degree_ID 
+   group by D.Deptarment;
+
+5. Querying the CGPA of max payed student in each department
+   select I.RollNo,D.Deptarment,max(P.Pay),S.CGPA,S.Name     
+   from Interview as I,Student_Details as S,Degree as D,Profile as P      
+   where Outcome='Placed' and I.RollNo=S.RollNo and S.Degree_ID=D.Degree_ID and P.Org_ID=I.Org_ID 
+   group by D.Deptarment;

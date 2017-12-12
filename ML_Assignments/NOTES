@@ -1,0 +1,21 @@
+PCA
+------
+1. High dimension data is projected on to lower dimension space
+	Two things to decide -- no.of dimensions, and projection space
+	No.of.dimensions -- max info is retained
+	Projection space -- projection error is minimized
+
+	X -> S, svd(S) = [u,d,v]  X -- data, S -- covariance matix of X
+							  u -- eigen vectors, d -- eigen values
+	least values of k for which , cumulative sum of eigenvalues divide by the total sum of eigenvalues > % varaince retained
+
+
+Perceptron 
+----------
+f(x) = xTB + Bo  xT -- x transpose 
+
+1. Min distance b/w misclassified points and hyper plane
+	(B,B0) = (B,B0) + W(yixi,yi) --> if xi is misclassified, yi -- true label of class
+	Linearly Separable -- convergence to some solution(depends on starting point)
+	Takes more time for convergence
+	Non-Linearly Separable -- No convergence
