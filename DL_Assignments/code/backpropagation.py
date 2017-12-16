@@ -1,5 +1,10 @@
+import gzip
+import pickle
 import argparse
+import numpy as np
+from net import *
 
+# A function for anneal(T/F) argument
 def str2bool(v):
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
         return True
@@ -8,6 +13,7 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
+# Arguments Parser
 ap = argparse.ArgumentParser()
 ap.add_argument('--lr', type=float, default=0.01)
 ap.add_argument('--momentum', type=float, default=0.9)
@@ -23,8 +29,14 @@ ap.add_argument('--expt_dir', type=str)
 ap.add_argument('--mnist', type=str)
 
 
-
+print '[INFO] Parsing the Arguments...'
 args = vars(ap.parse_args())
+
+num_hidden = args['num_hidden']
+sizes  = map(int,args['sizes'].split(','))
+
+if len(sizes) != num_hidden :
+	ap.error('len(sizes) is not equal to num of hidden layers')
 
 if args['batch_size']%5 == 0 or args['batch_size'] == 1 :
 	batch_size  = args['batch_size']
@@ -33,8 +45,6 @@ else:
 
 lr = args['lr']
 momentum = args['momentum']
-num_hidden = args['num_hidden']
-sizes  = map(int,args['sizes'].split(','))
 opt = args['opt']
 loss  = args['loss']
 anneal  = args['anneal']
@@ -42,7 +52,44 @@ activation = args['activation']
 save_dir  = args['save_dir']
 expt_dir  = args['expt_dir']
 mnist  = args['mnist']
+print '[INFO] Arguments Parsing Done!'
 
-# print lr,momentum,num_hidden,sizes,batch_size,opt,loss,anneal,activation,save_dir,expt_dir,mnist
-# if anneal:
-# 	print 'anneal--true'
+print '[INFO] Arguments details: ',lr,momentum,num_hidden,sizes,batch_size,opt,loss,anneal,activation,save_dir,expt_dir,mnist
+if anneal:
+	print 'anneal--true'
+
+# Reading data
+print '[INFO] Loaidng the data...'
+with gzip.open(mnist, 'rb') as f:
+	train_data, valid_data, test_data = pickle.load(f)
+
+train_x, train_y = train_data
+valid_x, valid_y = valid_data
+test_x, test_y = test_data
+
+print '[INFO] Training_data details: ',train_x.shape, train_y.shape
+print '[INFO] Validation_data details: ',valid_x.shape, valid_y.shape 
+print '[INFO] Testing_data details: ',test_x.shape, test_y.shape
+print '[INFO] Reading the data Done!'
+
+# Getting the dimensions of input and output
+in_dim = train_x.shape[1]
+out_dim = np.unique(train_y).shape[0]
+print '[INFO] Length of input vector: ', in_dim
+print '[INFO] Length of output vector: ', out_dim
+
+# Neural net building and weight intilization 
+print '[INFO] Model and weights intilization...'
+sizes.insert(0,in_dim)
+sizes.append(out_dim)
+weights,biases = build_model(sizes)
+
+print '[INFO] Weights details:'
+for i,j in zip(weights,biases):
+	print i.shape,j.shape
+print '[INFO] Weights intilization Done!'
+
+outputs,local_grads_weights,local_grads_biases = forward_pass(data_X,batch_size,weights,biases,activ_fun)
+
+# weight_grads = evaluate_grad(loss W_in,W_hid,b_hid,W_out,b_out)
+
