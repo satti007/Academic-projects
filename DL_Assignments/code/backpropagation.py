@@ -89,7 +89,16 @@ for i,j in zip(weights,biases):
 	print i.shape,j.shape
 print '[INFO] Weights intilization Done!'
 
-outputs,local_grads_weights,local_grads_biases = forward_pass(data_X,batch_size,weights,biases,activ_fun)
+data_X = train_x[0:batch_size]
+data_y = np.zeros((batch_size, 10))
+data_y[np.arange(batch_size), train_y[0:batch_size]] = 1
+
+outputs,local_grads_weights,local_grads_biases = forward_pass(data_X,batch_size,weights,biases,activation)
+# print outputs
+error, output_grad = get_loss(loss,outputs,data_y,batch_size)
+print error, output_grad.shape
+
+grads_weights,grads_biases = back_prop(output_grad,local_grads_weights,local_grads_biases,weights,sizes)
+
 
 # weight_grads = evaluate_grad(loss W_in,W_hid,b_hid,W_out,b_out)
-

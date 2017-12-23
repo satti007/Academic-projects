@@ -12,7 +12,7 @@ PCA
 
 Perceptron 
 ----------
-f(x) = xTB + Bo  xT -- x transpose 
+f(x) = xTB + Bo | xT -- x transpose 
 
 1. Min distance b/w misclassified points and hyper plane
 	(B,B0) = (B,B0) + W(yixi,yi) --> if xi is misclassified, yi -- true label of class
