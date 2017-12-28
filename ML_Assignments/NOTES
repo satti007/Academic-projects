@@ -19,3 +19,6 @@ f(x) = xTB + Bo | xT -- x transpose
 	Linearly Separable -- convergence to some solution(depends on starting point)
 	Takes more time for convergence
 	Non-Linearly Separable -- No convergence
+
+KNN
+------

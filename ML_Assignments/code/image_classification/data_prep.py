@@ -2,7 +2,12 @@ import scipy.io
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-def load_data(path,labels):
+'''def Sampling(train_X, train_y):
+	from imblearn.over_sampling import SMOTE
+	sm = SMOTE(random_state=12, ratio = 1.0)
+	train_X,train_y = sm.fit_sample(train_X, train_y)
+'''
+def load_data(path,labels,doSampling=False):
 	mat = scipy.io.loadmat(path) 
 	
 	train_X = np.zeros((100,48))
@@ -31,5 +36,10 @@ def load_data(path,labels):
 	test_X  = test_X[100:]
 	test_y  = test_y[100:]
 	
+	if doSampling:
+		train_X,train_y = Sampling(train_X, train_y)
+	
 	return 	train_X,train_y,valid_X,valid_y,test_X ,test_y  
 
+data_X = np.zeros((100,48))
+data_y = np.ones(100, dtype=int)
