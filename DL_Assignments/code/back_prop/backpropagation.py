@@ -116,8 +116,8 @@ def get_accuracy(outputs,true_labels,train):
 
 
 def load_weights(save_dir,state):
-	biases  = np.load(save_dir+'/biases_{}.npy'.format(state))
-	weights = np.load(save_dir+'/weights_{}.npy'.format(state))
+	biases  = list(np.load(save_dir+'/biases_{}.npy'.format(state)))
+	weights = list(np.load(save_dir+'/weights_{}.npy'.format(state)))
 	
 	return weights,biases
 
@@ -155,23 +155,23 @@ def train(max_epochs,save_dir,weights,biases,opt,lr,anneal,sizes):
 			weights,biases,prev_list =  weights_update(weights,biases,layer_outputs,gradients,sizes,batch_size,opt,lr,prev_list,momentum)
 			if step%100 == 0:
 				print '[INFO] Epoch {}, Step {}, Loss: {}, train_accuracy: {}'.format(epochs,step,error,train_accuracy)
-		save_weights(save_dir,weights,biases,epochs)
 		valid_accuracy = do_predictions(valid_x,valid_y,weights,biases)
 		print '[INFO] Validation_accuracy at {} epochs is {}'.format(epochs,valid_accuracy)
 		if anneal:
 			if valid_accuracy < anneal_valid_accuracy:
 				lr = lr*0.5
 				weights,biases = load_weights(save_dir,epochs-1)
-				print '[INFO] learning_rate annealed to half'
+				print '[INFO] learning_rate annealed to half, lr: {}'.format(lr)
 				continue
 			anneal_valid_accuracy = valid_accuracy
+		save_weights(save_dir,weights,biases,epochs)
 		epochs = epochs + 1
 	print do_predictions(test_x,test_y,weights,biases)
 
 lr,momentum,num_hidden,sizes,batch_size,opt,loss,anneal,activation,save_dir,expt_dir,mnist = get_arguments()
 train_x, train_y,valid_x, valid_y,test_x, test_y = load_data(mnist)
 weights,biases = get_model(sizes,train_x,train_y)
-max_epochs = 1
+max_epochs = 100
 print '[INFO] Model training started...'
 train(max_epochs,save_dir,weights,biases,opt,lr,anneal,sizes)
 print '[INFO] Model training done!'
@@ -263,9 +263,8 @@ if training:
 else:
 	state = int(raw_input('Enter the state of restoring: '))
 	weights,biases = load_weights(weights_path,state)
-	print do_predictions(valid_x,valid_y,weights,biases)
+	print do_predictions(test_x,test_y,weights,biases)
 '''
-
 '''
 def train(max_epochs,save_dir,weights,biases,opt,lr,anneal,sizes):
 	epochs = 1
