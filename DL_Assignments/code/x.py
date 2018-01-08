@@ -155,3 +155,44 @@ def train(load=None,K=None):
     save_pb()
 
 train()
+
+
+def model(x):
+with tf.contrib.slim.arg_scope([tf.contrib.slim.model_variable, tf.contrib.slim.variable]):
+
+# TODO: Convlayer: input = 32,32,3  output = 32,32,64
+layer_1 = conv2d(x,64,3,1,'SAME','conv1')
+
+# TODO: poollayer: input = 32,32,64  output = 16,16,64
+pool_1 = max_pool2d(layer_1,2,2)
+
+# TODO: Convlayer: input = 16,16,64 output = 16,16,128
+layer_2 = conv2d(pool_1,128,3,1,'SAME','conv2')        
+
+# TODO: poollayer: input = 16,16,128  output = 8,8,128
+pool_2 = max_pool2d(layer_2,2,2)
+
+# TODO: Convlayer: input = 8,8,128  output = 8,8,256
+layer_3 = conv2d(pool_2,256,3,1,'SAME','conv3')
+
+# TODO: Convlayer: input = 8,8,256  output = 8,8,256
+layer_4 = conv2d(layer_3,256,3,1,'SAME','conv4')
+
+# TODO: poollayer: input = 8,8,256  output = 4,4,256
+pool_3 = max_pool2d(layer_4,2,2)
+
+# TODO: poollayer: input = 4,4,256  output = 4096
+layer_f = tf.contrib.layers.flatten(pool_3)
+
+# TODO: FC layer: input = 4096 output = 1024
+layer_5 = FC(layer_f,1024,'fc5')
+
+# TODO: FC layer: input = 1024  output = 1024
+layer_6 = FC(layer_5,1024,'fc6')
+
+# TODO: FC layer: input = 1024  output = 10
+logits = FC(layer_6,10,'fc7')
+
+y = tf.nn.softmax(logits,name='output_node')
+
+return logits,y
