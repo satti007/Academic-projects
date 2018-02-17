@@ -1,4 +1,5 @@
 from knn import * 
+from SVM_model import *
 from data_prep import *
 from sklearn.metrics import confusion_matrix,accuracy_score
 
@@ -23,6 +24,7 @@ print '[INFO] knn model done!'
 train_X,train_y,valid_X,valid_y,test_X ,test_y = load_data(path,labels,doSampling=True)
 print '[INFO] Model_2: SVM-Gaussaion Kernel...'
 predictions = svm_classify(train_X,train_y,valid_X,valid_y,test_X,test_y)
+print '[INFO] Accuracy for SVM-Gaussaion: {:.2f}%'.format(100*accuracy_score(test_y,nn_predictions))
 print '[INFO] SVM-Gaussaion Kernel done!'
 
 

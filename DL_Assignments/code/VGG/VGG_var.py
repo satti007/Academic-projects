@@ -20,8 +20,12 @@ def FC(input_layer,neurons,scope):
 	with tf.variable_scope(scope) as scope:
 		return tf.contrib.layers.fully_connected(inputs=input_layer,num_outputs=neurons,scope=scope)
 
+def softmax(input_layer,neurons,scope,is_training_mode):
+	with tf.variable_scope(scope) as scope:
+		return tf.contrib.layers.fully_connected(inputs=input_layer,num_outputs=neurons,activation_fn=None,
+						normalizer_fn=tf.contrib.layers.batch_norm,normalizer_params={'is_training': is_training_mode},scope=scope)
 
-def model(x):
+def model(x,is_training_mode):
 	with tf.contrib.slim.arg_scope([tf.contrib.slim.model_variable, tf.contrib.slim.variable]):
 		
 		# TODO: Convlayer: input = 32,32,3  output = 32,32,64
@@ -55,7 +59,7 @@ def model(x):
 		layer_6 = FC(layer_5,1024,'fc6')
 		
 		# TODO: FC layer: input = 1024  output = 10
-		logits = FC(layer_6,10,'fc7')
+		logits = softmax(layer_6,10,'fc7',is_training_mode)
 		
 		y = tf.nn.softmax(logits,name='output_node')
 		
@@ -68,8 +72,8 @@ def get_batch_data(batch_size,isTrain):
 	else:
 		data_X = valid_X
 		data_y = valid_y
-	batch_size =3
-	# indicies = [0,1,2]
+	batch_size = 8
+	indicies = [0,1,2,3,4,5,6,7]
 	# indicies = random.sample(range(0,data_X.shape[0]), batch_size) 
 	xs = data_X[indicies]
 	ys = np.zeros((batch_size, 10))
@@ -94,12 +98,14 @@ def load_weights(iters):
 
 def accuracy(y,y_,iters):
 	correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+	print sess.run(correct_prediction)
 	acc = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 	print "step %d validation accuracy %g" % (iters,sess.run(acc))
 
 x  = tf.placeholder(tf.float32, [None,32,32,3], name='input_node')
 y_ = tf.placeholder("float",shape=[None,10])
-logits,y = model(x)
+is_training_mode = tf.placeholder(tf.bool,name='is_training_mode')
+logits,y = model(x,is_training_mode)
 cross_entropy = tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=y_))
 train_step = tf.train.AdamOptimizer(1e-3).minimize(cross_entropy)
 
@@ -115,12 +121,13 @@ def train(load=None,state=None):
 		while True:
 			iters += 1
 			xs,ys = get_batch_data(batch_size,True)
-			print sess.run(y,feed_dict={x:xs})
-			print sess.run(logits,feed_dict={x:xs})
-			sess.run(train_step, feed_dict={x:xs,y_:ys})
+			# print sess.run(logits,feed_dict={x:xs,is_training_mode:True})
+			sess.run(train_step, feed_dict={x:xs,y_:ys,is_training_mode:True})
 			if iters % 5 == 0:
-				loss=sess.run(cross_entropy,feed_dict={x:xs,y_:ys})
+				loss=sess.run(cross_entropy,feed_dict={x:xs,y_:ys,is_training_mode:True})
 				print "step %d training loss %g" % (iters,loss)
+				pred=sess.run(y,feed_dict={x:xs,is_training_mode:False})
+			 	accuracy(pred.reshape(8,10),ys,iters)
 			
 			# if iters % 500 == 0:
 			# 	xs,ys = get_batch_data(500,False)
